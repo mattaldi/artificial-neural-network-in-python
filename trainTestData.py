@@ -6,15 +6,17 @@ nData               = 150
 nCategory           = 3
 nPercentTrainData   = 80
 nFeature            = 4
-nIterations         = 1000
+nIterations         = 50
 eta     	    = 0.04
 alpha               = 0.02
-hiddenNodes         = 8
+hiddenNodes         = 5
 fileCsv             = 'iriscsv.csv'
 ofile_weights1 	    = "weight1.csv"
 ofile_weights2 	    = "weight2.csv"
+
 nfile_weights1 	    = "weight1_new.csv"
 nfile_weights2 	    = "weight2_new.csv"
+
 
 
 nPercentTrainData   = nPercentTrainData / float(100)
@@ -22,7 +24,8 @@ nPart       = nData/nCategory
 nTrainData  = int(round(nPart * nPercentTrainData))
 nTestData   = nPart - nTrainData
 
-nTrainDataAll = nTrainData * nCategory
+nTrainDataAll   = nTrainData * nCategory
+nTestDataAll    = nTestData * nCategory
 p               = nTrainDataAll
 nPatterns       = p
 i               = nFeature
@@ -59,6 +62,21 @@ fdtrain = dtrain[:,0:nFeature]
 ldtrain = dtrain[:,nFeature]
 out0    = fdtrain
 
+
+hasil = []
+data4   = data[40:50,:]
+data5   = data[90:100,:]
+data6   = data[140:150,:]
+dtest   = np.concatenate((data4, data5, data6),axis=0)
+fdtest  = dtest[:,0:4]
+ldtest  = dtest[:,4]
+out0test    = fdtest
+
+
+
+
+
+
 x = 0
 target = np.zeros([nTrainDataAll,nCategory])
 for m in range(0,nCategory):
@@ -66,12 +84,12 @@ for m in range(0,nCategory):
         target[x,m] = 1
         x = x + 1
 
+
 wg1     = pd.read_csv(ofile_weights1, header=None)
 wg2     = pd.read_csv(ofile_weights2, header=None)
 
 w1      = wg1.values
 w2      = wg2.values
-
     
 
 for xq in range (0,nIterations):
@@ -160,10 +178,62 @@ for xq in range (0,nIterations):
 
 
 
+testTargetReal = np.zeros([nTestDataAll,nCategory])
+testTargetObserv = np.zeros([nTestDataAll,nCategory])
+
+
+x = 0
+target = np.zeros([nTestDataAll,nCategory])
+for m in range(0,nCategory):
+    for i in range(0,nTestData):
+        testTargetReal[x,m] = 1
+        x = x + 1
+
+
+# pattern ke - xp
+for xp in range(0,nTestDataAll):
+
+    #hidden layer
+    for h in range(0,nHiddenNodes):
+        sums = 0
+        for i in range(0,nInputNodes):
+            a       =   w1[h][i]  *  out0test[xp][i]
+            sums    = sums + a
+        out1[xp][h]   =   1.0  /  (1.0  +  np.exp(-sums))
+
+    #output layer
+    for j in range(0,nOutputNodes):
+        sums = 0
+        for h in range(0,nHiddenNodes):
+            a       =   w2[j][h]  *  out1[xp][h]
+            sums    = sums + a
+        out2[xp][j] =   1.0  /  (1.0  +  np.exp(-sums))
+
+
+    zz = out2[xp][:]
+    mval = max(zz)
+    i = zz.tolist().index(mval)
+    testTargetObserv[xp][i] = 1
+
+
+
+
+
+trueList = []
+for xp in range(0,nTestDataAll):
+    if ((testTargetObserv[xp] == testTargetReal[xp]).all()==True):
+        trueList = np.append(trueList, 1)
+    else:
+        trueList = np.append(trueList, 0)
+    
+
+percentTrue = (sum(trueList)/nTestDataAll)*100
+print percentTrue
+
+
 
 df1 = pd.DataFrame(w1)
 df2 = pd.DataFrame(w2)
 df1.to_csv(nfile_weights1, index=False, header=False)
 df2.to_csv(nfile_weights2, index=False, header=False)
-
 

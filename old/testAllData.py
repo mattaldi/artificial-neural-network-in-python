@@ -79,8 +79,8 @@ delw1 = np.zeros([h,i])
 
 
 hasil = []
-file_weights1 	= "weight1.csv"
-file_weights2 	= "weight2.csv"
+file_weights1 	= "weight1_new.csv"
+file_weights2 	= "weight2_new.csv"
 
 wg1     = pd.read_csv(file_weights1, header=None)
 wg2     = pd.read_csv(file_weights2, header=None)

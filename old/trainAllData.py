@@ -1,73 +1,70 @@
 import numpy as np
 import pandas as pd
 
-
-nData               = 150
-nCategory           = 3
-nPercentTrainData   = 80
-nFeature            = 4
-nIterations         = 1000
-eta     	    = 0.04
-alpha               = 0.02
-hiddenNodes         = 8
-fileCsv             = 'iriscsv.csv'
-ofile_weights1 	    = "weight1.csv"
-ofile_weights2 	    = "weight2.csv"
-nfile_weights1 	    = "weight1_new.csv"
-nfile_weights2 	    = "weight2_new.csv"
-
-
-nPercentTrainData   = nPercentTrainData / float(100)
-nPart       = nData/nCategory
-nTrainData  = int(round(nPart * nPercentTrainData))
-nTestData   = nPart - nTrainData
-
-nTrainDataAll = nTrainData * nCategory
-p               = nTrainDataAll
-nPatterns       = p
-i               = nFeature
-nInputNodes     = i
-h               = hiddenNodes
-nHiddenNodes    = h
-j               = nCategory
-nOutputNodes    = j
-
-out1            = np.zeros([p,h])
-out2            = np.zeros([p,j])
-delta1          = np.zeros([p,h])
-delta2          = np.zeros([p,j])
-delw2           = np.zeros([j,h])
-delw1           = np.zeros([h,i])
-
-
+fileCsv = 'iriscsv.csv'
 
 datas   = pd.read_csv(fileCsv, header=None, parse_dates=True)
 data    = datas.values
 
-dataCollect = np.zeros(nCategory, dtype=object)
-
-for i in range(0, nCategory):
-    fd1 = nPart*i
-    fd2 = nPart*i+nTrainData
-    dataCollect[i]   = np.array(data[fd1:fd2,:])
-
-dtrain  = dataCollect[0]
-for i in range(1, nCategory):
-    dtrain  = np.concatenate((dtrain,dataCollect[i]),axis=0)
-
-fdtrain = dtrain[:,0:nFeature]
-ldtrain = dtrain[:,nFeature]
+data1   = data[0:40,:]
+data2   = data[50:90,:]
+data3   = data[100:140,:]
+dtrain  = np.concatenate((data1, data2, data3),axis=0)
+fdtrain = dtrain[:,0:4]
+ldtrain = dtrain[:,4]
 out0    = fdtrain
 
-x = 0
-target = np.zeros([nTrainDataAll,nCategory])
-for m in range(0,nCategory):
-    for i in range(0,nTrainData):
-        target[x,m] = 1
-        x = x + 1
+data4   = data[40:50,:]
+data5   = data[90:100,:]
+data6   = data[140:150,:]
+dtest   = np.concatenate((data4, data5, data6),axis=0)
+fdtest  = dtest[:,0:4]
+ldtest  = dtest[:,4]
 
-wg1     = pd.read_csv(ofile_weights1, header=None)
-wg2     = pd.read_csv(ofile_weights2, header=None)
+
+x = 0
+target = np.zeros([len(ldtrain),3])
+for i in range(0,len(ldtrain)):
+    labelnow = ldtrain[i]
+    if (labelnow == "Iris-setosa"):
+        target[x,0] = 1
+    if (labelnow == "Iris-versicolor"):
+        target[x,1] = 1
+    if (labelnow == "Iris-virginica"):
+        target[x,2] = 1
+    x = x + 1
+
+    
+
+
+nIterations     = 1000
+p               = 120
+nPatterns       = p
+i               = 4
+nInputNodes     = i
+h               = 8
+nHiddenNodes    = h
+j               = 3
+nOutputNodes    = j
+
+eta     	= 0.04
+alpha           = 0.02
+
+
+out1 = np.zeros([p,h])
+out2 = np.zeros([p,j])
+delta1 = np.zeros([p,h])
+delta2 = np.zeros([p,j])
+delw2 = np.zeros([j,h])
+delw1 = np.zeros([h,i])
+
+
+
+file_weights1 	= "weight1.csv"
+file_weights2 	= "weight2.csv"
+
+wg1     = pd.read_csv(file_weights1, header=None)
+wg2     = pd.read_csv(file_weights2, header=None)
 
 w1      = wg1.values
 w2      = wg2.values
@@ -163,7 +160,7 @@ for xq in range (0,nIterations):
 
 df1 = pd.DataFrame(w1)
 df2 = pd.DataFrame(w2)
-df1.to_csv(nfile_weights1, index=False, header=False)
-df2.to_csv(nfile_weights2, index=False, header=False)
+df1.to_csv("weight1_new.csv", index=False, header=False)
+df2.to_csv("weight2_new.csv", index=False, header=False)
 
 
