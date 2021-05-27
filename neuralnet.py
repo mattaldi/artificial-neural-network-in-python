@@ -6,7 +6,6 @@ class neuralnet:
     def __init__(self, nData, nCategory, nPercentTrainData,
              nFeature, nIterations, eta, alpha, hiddenNodes, fileCsv,
              ofile_weights1, ofile_weights2, nfile_weights1, nfile_weights2 ):
-
         self.nData               = nData
         self.nCategory           = nCategory
         self.nPercentTrainData   = nPercentTrainData
@@ -22,13 +21,10 @@ class neuralnet:
         self.nfile_weights2 	 = nfile_weights2
 
     def trainData(self):
-
-        
         self.nPercentTrainData   = self.nPercentTrainData / float(100)
         nPart       = self.nData/self.nCategory
         nTrainData  = int(round(nPart * self.nPercentTrainData))
         nTestData   = nPart - nTrainData
-
         nTrainDataAll   = nTrainData * self.nCategory
         nTestDataAll    = nTestData * self.nCategory
         p               = nTrainDataAll
@@ -39,18 +35,12 @@ class neuralnet:
         nHiddenNodes    = int(h)
         j               = self.nCategory
         nOutputNodes    = int(j)
-
-
-
         out1            = np.zeros([p,h])
         out2            = np.zeros([p,j])
         delta1          = np.zeros([p,h])
         delta2          = np.zeros([p,j])
         delw2           = np.zeros([j,h])
         delw1           = np.zeros([h,i])
-
-
-
         datas   = pd.read_csv(self.fileCsv, header=None, parse_dates=True)
         data    = datas.values
 
@@ -68,8 +58,7 @@ class neuralnet:
         fdtrain = dtrain[:,0:self.nFeature]
         ldtrain = dtrain[:,self.nFeature]
         out0    = fdtrain
-
-
+        
         hasil = []
         data4   = data[40:50,:]
         data5   = data[90:100,:]
@@ -79,11 +68,6 @@ class neuralnet:
         ldtest  = dtest[:,4]
         out0test    = fdtest
 
-
-
-
-
-
         x = 0
         target = np.zeros([nTrainDataAll,self.nCategory])
         for m in range(0,self.nCategory):
@@ -91,14 +75,11 @@ class neuralnet:
                 target[x,m] = 1
                 x = x + 1
 
-
         wg1     = pd.read_csv(self.ofile_weights1, header=None)
         wg2     = pd.read_csv(self.ofile_weights2, header=None)
-
         w1      = wg1.values
         w2      = wg2.values
-            
-
+           
         for xq in range (0,self.nIterations):
             print xq
 
@@ -124,7 +105,6 @@ class neuralnet:
                 #delta output
                 for j in range(0,nOutputNodes):
                     delta2[xp][j]   =   (target[xp][j] - out2[xp][j])  * out2[xp][j]   *   (1.0 - out2[xp][j]);
-
 
                 #delta hidden
                 for h in range(0,nHiddenNodes):
